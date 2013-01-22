@@ -9,6 +9,7 @@ namespace SimplePageCrawler;
 
 use ArrayObject;
 use Zend\Stdlib\AbstractOptions;
+use Zend\Stdlib\Exception;
 
 class Response extends AbstractOptions
 {
@@ -18,12 +19,12 @@ class Response extends AbstractOptions
     protected $title;
 
     /**
-     * @var ArrayObject
+     * @var Response\Meta
      */
     protected $meta;
 
     /**
-     * @var ArrayObject
+     * @var Response\Image
      */
     protected $images;
 
@@ -36,15 +37,6 @@ class Response extends AbstractOptions
      * @var ArrayObject
      */
     protected $links;
-
-    public function __construct($options = null)
-    {
-        parent::__construct($options);
-        $this->meta = new ArrayObject();
-        $this->images = new ArrayObject();
-        $this->headingTags = new ArrayObject();
-        $this->links = new ArrayObject();
-    }
 
     public function getTitle()
     {
@@ -59,37 +51,53 @@ class Response extends AbstractOptions
 
     public function getMeta($meta = null)
     {
+        if(null === $this->meta) {
+            $this->setMeta(new Response\Meta());
+        }
         if($meta) {
-            return $this->meta[$meta];
+            return $this->meta->getMeta($meta);
         }
         return $this->meta;
     }
 
-    public function setMeta(array $meta)
+    public function setMeta(Response\Meta $meta)
     {
-        $this->meta->exchangeArray($meta);
+        $this->meta = $meta;
         return $this;
     }
 
     public function getImages()
     {
+        if(null === $this->images) {
+            $this->setImages(new Response\Image());
+        }
         return $this->images;
     }
 
-    public function setImages(array $images)
+    public function setImages(Response\Image $images)
     {
-        $this->images->exchangeArray($images);
+        $this->images = $images;
         return $this;
     }
 
     public function getHeadingTags()
     {
+        if(null === $this->headingTags) {
+            $this->setHeadingTags(new ArrayObject());
+        }
         return $this->headingTags;
     }
 
-    public function setHeadingTags(array $headingTags)
+    public function setHeadingTags($headingTags)
     {
-        $this->headingTags->exchangeArray($headingTags);
+        if(is_array($headingTags)) {
+            $this->getHeadingTags()->exchangeArray($headingTags);
+            return $this;
+        }
+        if(!$headingTags instanceof ArrayObject) {
+            throw new Exception\InvalidArgumentException('Heading tags must be an array or an ArrayObject');
+        }
+        $this->headingTags = $headingTags;
         return $this;
     }
 
@@ -120,12 +128,22 @@ class Response extends AbstractOptions
 
     public function getLinks()
     {
+        if(null === $this->links) {
+            $this->setLinks(new ArrayObject());
+        }
         return $this->links;
     }
 
-    public function setLinks(array $links)
+    public function setLinks($links)
     {
-        $this->links->exchangeArray($links);
+        if(is_array($links)) {
+            $this->getLinks()->exchangeArray($links);
+            return $this;
+        }
+        if(!$links instanceof ArrayObject) {
+            throw new Exception\InvalidArgumentException('Links must be an array or an ArrayObject');
+        }
+        $this->links = $links;
         return $this;
     }
 }

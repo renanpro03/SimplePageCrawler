@@ -31,4 +31,19 @@ class PageCrawlerTest extends TestCase
         $this->assertTrue(in_array('/fr/user/logout', $response->getLinks()->getArrayCopy()));
         $this->assertFalse(in_array('#', $response->getLinks()->getArrayCopy()));
     }
+
+    public function testCanGetOpenGraphMeta()
+    {
+        $pageCrawler = new PageCrawler();
+        $response = $pageCrawler->get('http://au-coeur-de-zend-framework-2.fr');
+
+        $metas = $response->getMeta()->getMeta();
+        $openGraph = $response->getMeta()->getOpenGraph();
+
+        $this->assertTrue($metas->offsetExists('description'));
+        $this->assertTrue($openGraph->offsetExists('image'));
+
+        $this->setExpectedException('Zend\Stdlib\Exception\InvalidArgumentException');
+        $response->getMeta('image');
+    }
 }

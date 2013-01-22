@@ -17,17 +17,18 @@ class PageParser
         $domQuery = new DomQuery();
         $domQuery->setDocumentHtml($source);
 
-        $metas = $response->getMeta();
+        $metas = array();
         $nodes = $domQuery->queryXpath('//meta');
         foreach($nodes as $node) {
-            if(!$node->hasAttribute('name')) {
+            if(!$node->hasAttribute('name') && !$node->hasAttribute('property')) {
                 continue;
             }
-            $name = $node->getAttribute('name');
+            $name = $node->getAttribute('name') ?: $node->getAttribute('property');
             $name = strtolower($name);
             $content = $node->getAttribute('content');
-            $metas->offsetSet($name, $content);
+            $metas[$name] = $content;
         }
+        $response->getMeta()->exchangeArray($metas);
 
         $tags = $response->getHeadingTags();
         $h1 = array();
@@ -73,7 +74,7 @@ class PageParser
         foreach($nodes as $node) {
             $img[] = $node->getAttribute('src');
         }
-        $response->images = array_unique($img);
+        $response->getImages()->exchangeArray(array_unique($img));
 
         $links = array();
         $nodes = $domQuery->queryXpath('//a');

@@ -22,6 +22,7 @@ class PageCrawler
     /**
      * Crawl & parse the uri
      * @param string $uri
+     * @return Response
      */
     public function get($uri)
     {
