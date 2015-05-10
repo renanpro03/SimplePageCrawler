@@ -28,6 +28,15 @@ echo sprintf('The title is "%s"', $page->getTitle());
 echo sprintf('The description is "%s"', $page->getMeta('description'));
 ```
 
+Updated: ZF2 2.4.0
+The first method get() belongs to ServiceLocator(), the second, use it to get the page information.
+```php
+$crawler = $this->getServiceLocator()->get('SimplePageCrawler');
+$page = $crawler->get('http://www.nytimes.com');
+
+echo sprintf('The title is "%s"', $page->getTitle());
+echo sprintf('The description is "%s"', $page->getMeta('description'));
+```
 You can use th action helper :
 
 ```php
